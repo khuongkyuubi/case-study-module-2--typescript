@@ -114,9 +114,18 @@ function deleteEmployee(index) {
 function updateSearchInput() {
     let searchInput = document.getElementById("search-input");
     searchInput.addEventListener("input", () => {
-        console.log(searchInput["value"]);
-        searchData(searchInput["value"], employeeManager.employeeList, "_name", "_email", "_address");
+        callSearchFunction(searchInput);
     });
+    searchInput.addEventListener("keypress", (event) => {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            callSearchFunction(searchInput);
+        }
+    });
+}
+function callSearchFunction(searchInput) {
+    console.log(searchInput["value"]);
+    searchData(searchInput["value"], employeeManager.employeeList, "_name", "_email", "_address");
 }
 function searchData(data, arr, ...field) {
     let result = [];
@@ -132,7 +141,8 @@ function searchData(data, arr, ...field) {
                 break;
         }
     }
-    renderEmployeeList(result);
+    console.log(data);
+    renderEmployeeList(result, data);
     updateEditBtn(result);
     return result;
 }
@@ -277,6 +287,10 @@ function renderEmployeeList(employeeMnr, searchValue) {
     else {
         arr = employeeMnr;
     }
+    console.log(searchValue);
+    function replacer(match) {
+        return `<strong style="color: orangered">${match}</strong>`;
+    }
     // console.log(arr)
     if (arr.length === 0) {
         html += "<tr>";
@@ -295,9 +309,17 @@ function renderEmployeeList(employeeMnr, searchValue) {
             </td>
             `;
             html += `<td>${i + 1}</td>`;
-            html += `<td>${arr[i]["_name"]}</td>`;
-            html += `<td>${arr[i]["_email"]}</td>`;
-            html += `<td>${arr[i]["_address"]}</td>`;
+            if (searchValue) {
+                let regExp = new RegExp(searchValue, 'gim');
+                html += `<td>${arr[i]["_name"].replace(regExp, replacer)}</td>`;
+                html += `<td>${arr[i]["_email"].replace(regExp, replacer)}</td>`;
+                html += `<td>${arr[i]["_address"].replace(regExp, replacer)}</td>`;
+            }
+            else {
+                html += `<td>${arr[i]["_name"]}</td>`;
+                html += `<td>${arr[i]["_email"]}</td>`;
+                html += `<td>${arr[i]["_address"]}</td>`;
+            }
             html += `<td>${arr[i]["_phone"]}</td>`;
             html += `<td>
                      <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"
@@ -310,6 +332,11 @@ function renderEmployeeList(employeeMnr, searchValue) {
             html += "</tr>";
         }
     }
+    // if (searchData) {
+    //     let regExp = new RegExp('searchData', 'igm');
+    //
+    // }
+    // console.log("this is html", html)
     document.getElementById('employee-list').innerHTML = html;
     document.getElementById("show-entries-quantity").innerHTML = `Showing <b>${arr.length}</b> out of  <b>${employeeManager.employeeList.length}</b>  entries`;
     updateAddBtn();
