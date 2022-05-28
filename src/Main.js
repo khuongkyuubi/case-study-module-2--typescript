@@ -249,6 +249,7 @@ function removeMultiEmployee(employeeList) {
             listID.push(i);
         }
     }
+    // console.log(listID)
     if (document.getElementById("search-input")["value"] && employeeList) {
         result = employeeList.filter((employee, index) => {
             return listID.indexOf(index) === -1;
@@ -258,10 +259,12 @@ function removeMultiEmployee(employeeList) {
         result = employeeManager.employeeList.filter((employee, index) => {
             return listID.indexOf(index) === -1;
         });
+        console.log("result");
+        employeeManager.setEmployeeList(result);
     }
-    employeeManager.setEmployeeList(result);
-    console.log(result);
-    renderEmployeeList(employeeManager);
+    // employeeManager.setEmployeeList(result);
+    // console.log(result)
+    renderEmployeeList(employeeManager.employeeList);
     employeeManager.saveEmployeeListToLocal();
 }
 // Render List Method (Read feature)
