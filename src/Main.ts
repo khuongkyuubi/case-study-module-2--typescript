@@ -249,8 +249,9 @@ function updateSortButton() {
     let sortNameButton = document.getElementById("sort-name-asc") as HTMLElement;
     let sortEmailButton = document.getElementById("sort-email-asc") as HTMLElement;
     let sortAddressButton = document.getElementById("sort-address-asc") as HTMLElement;
+    let sortDefault = document.getElementById("manage-employees") as HTMLElement;
 
-    [sortNameButton, sortEmailButton, sortAddressButton].forEach((sortButton) => {
+    [sortNameButton, sortEmailButton, sortAddressButton, sortDefault].forEach((sortButton) => {
         sortButton.addEventListener("click", () => {
             switch (sortButton.id) {
                 case "sort-name-asc" :
@@ -265,10 +266,19 @@ function updateSortButton() {
                     flagForAddressSort = !flagForAddressSort;
                     flag = flagForAddressSort;
                     break;
+                case "manage-employees" :
+                    flag = true;
+                    break;
             }
             sortEmployee(sortButton.id, flag);
 
         })
+    })
+}
+
+function updateDefaultSort(): void {
+    $("#manage-employees").on("click", () => {
+
     })
 }
 
@@ -284,8 +294,11 @@ function sortEmployee(sortButtonId: string, flag: boolean) {
         case "sort-address-asc" :
             field = "_address";
             break;
+        case "manage-employees" :
+            field = "_createAt";
+            break;
     }
-    console.log(field);
+    // console.log(field);
 
     let arr: Employee[] = employeeManager.employeeList;
     let j: number;
@@ -313,7 +326,7 @@ function sortEmployee(sortButtonId: string, flag: boolean) {
         }
         flag = true;
     }
-    console.log(flag)
+    // console.log(flag)
 
     renderEmployeeList(employeeManager.employeeList)
     employeeManager.saveEmployeeListToLocal();

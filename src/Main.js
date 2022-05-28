@@ -216,7 +216,8 @@ function updateSortButton() {
     let sortNameButton = document.getElementById("sort-name-asc");
     let sortEmailButton = document.getElementById("sort-email-asc");
     let sortAddressButton = document.getElementById("sort-address-asc");
-    [sortNameButton, sortEmailButton, sortAddressButton].forEach((sortButton) => {
+    let sortDefault = document.getElementById("manage-employees");
+    [sortNameButton, sortEmailButton, sortAddressButton, sortDefault].forEach((sortButton) => {
         sortButton.addEventListener("click", () => {
             switch (sortButton.id) {
                 case "sort-name-asc":
@@ -231,9 +232,16 @@ function updateSortButton() {
                     flagForAddressSort = !flagForAddressSort;
                     flag = flagForAddressSort;
                     break;
+                case "manage-employees":
+                    flag = true;
+                    break;
             }
             sortEmployee(sortButton.id, flag);
         });
+    });
+}
+function updateDefaultSort() {
+    $("#manage-employees").on("click", () => {
     });
 }
 function sortEmployee(sortButtonId, flag) {
@@ -248,8 +256,11 @@ function sortEmployee(sortButtonId, flag) {
         case "sort-address-asc":
             field = "_address";
             break;
+        case "manage-employees":
+            field = "_createAt";
+            break;
     }
-    console.log(field);
+    // console.log(field);
     let arr = employeeManager.employeeList;
     let j;
     let temp2;
@@ -277,7 +288,7 @@ function sortEmployee(sortButtonId, flag) {
         }
         flag = true;
     }
-    console.log(flag);
+    // console.log(flag)
     renderEmployeeList(employeeManager.employeeList);
     employeeManager.saveEmployeeListToLocal();
 }

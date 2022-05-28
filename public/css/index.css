@@ -246,7 +246,6 @@ table.table .avatar {
     font-weight: normal;
 }
 
-/*.errors {*/
-/*    color: red;*/
-/*    font-size: 90%;*/
-/*}*/
+#manage-employees:hover {
+    cursor: pointer;
+}

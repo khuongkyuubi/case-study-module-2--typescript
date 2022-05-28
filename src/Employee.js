@@ -1,10 +1,11 @@
 export class Employee {
+    // private static ID: number = 0;
     constructor(name, email, address, phone) {
         this._name = name;
         this._email = email;
         this._address = address;
         this._phone = phone;
-        this._ID = Employee.ID++;
+        this._createAt = new Date();
     }
     get name() {
         return this._name;
@@ -31,5 +32,4 @@ export class Employee {
         this._phone = value;
     }
 }
-Employee.ID = 0;
 //# sourceMappingURL=Employee.js.map
