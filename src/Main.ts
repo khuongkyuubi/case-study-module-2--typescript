@@ -19,22 +19,78 @@ let address = document.getElementById('address') as HTMLInputElement
 let phone = document.getElementById('phone') as HTMLInputElement;
 let email = document.getElementById('email') as HTMLInputElement;
 
+// add function
 function updateAddBtn() {
     let updateAdd = document.getElementById("add-save");
-    updateAdd.addEventListener("click", addEmployee)
+    updateAdd.addEventListener("click", addEmployee);
+    $("#add-modal").on("click", () => {
+        resetAddInput(name, email, address, phone);
+    })
 }
 
-function resetAddInput(): void {
-    name["value"] = "";
-    address["value"] = "";
-    phone["value"] = "";
-    email["value"] = "";
+
+function resetAddInput(...elements): void {
+    elements.forEach((element) => {
+        element["value"] = "";
+        element.setAttribute("class", "form-control");
+        element.nextElementSibling.innerHTML = "";
+    })
+}
+
+
+// validate function
+function validateInput(...element: HTMLElement[]): boolean {
+    let count: number = 0;
+
+    // check name
+    if (!element[0]["value"].length) {
+        element[0].setAttribute("class", "form-control is-invalid");
+        element[0].nextElementSibling.innerHTML = "You must put name";
+    } else {
+        element[0].setAttribute("class", "form-control is-valid")
+        element[0].nextElementSibling.innerHTML = "";
+        count++;
+    }
+
+    // check email
+    if ((!element[1]["value"].length) || (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/gm.test(element[1]["value"]))) {
+        element[1].setAttribute("class", "form-control is-invalid");
+        element[1].nextElementSibling.innerHTML = "You must put correct email";
+    } else {
+        element[1].setAttribute("class", "form-control is-valid")
+        element[1].nextElementSibling.innerHTML = "";
+        count++;
+    }
+    // check address
+    if (!element[2]["value"].length) {
+        element[2].setAttribute("class", "form-control is-invalid");
+        element[2].nextElementSibling.innerHTML = "You must put correct address";
+    } else {
+        element[2].setAttribute("class", "form-control is-valid")
+        element[2].nextElementSibling.innerHTML = "";
+        count++;
+    }
+    //check phone
+
+    if ((!element[3]["value"].length) || (!/^[\d\W]{10,}$/gm.test(element[3]["value"]))) {
+        element[3].setAttribute("class", "form-control is-invalid");
+        element[3].nextElementSibling.innerHTML = "You must put correct phone number";
+    } else {
+        element[3].setAttribute("class", "form-control is-valid")
+        element[3].nextElementSibling.innerHTML = "";
+        count++;
+    }
+    return count === 4;
 }
 
 function addEmployee(): void {
-    employeeManager.addEmployee(name["value"], email["value"], address["value"], phone["value"]);
-    renderEmployeeList(employeeManager);
-    resetAddInput();
+    if (validateInput(name, email, address, phone)) {
+        //@ts-ignore
+        $('#addEmployeeModal').modal('hide'); // modal available in bootstrap jquery
+        employeeManager.addEmployee(name["value"], email["value"], address["value"], phone["value"]);
+        renderEmployeeList(employeeManager);
+        resetAddInput(name, email, address, phone);
+    }
 }
 
 // Update Feature
@@ -49,6 +105,7 @@ function updateEditBtn(employeeList?: Array<Employee>): void {
     let editBtn = document.getElementsByClassName("edit");
     for (let i = 0; i < editBtn.length; i++) {
         editBtn[i].addEventListener("click", () => {
+            resetAddInput(nameEdit, emailEdit, addressEdit, phoneEdit);
             if (document.getElementById("search-input")["value"] && employeeList) {
                 try {
                     nameEdit["value"] = employeeList[i]["_name"];
@@ -96,12 +153,17 @@ function updateSaveEditBtn(employeeList?: Array<Employee>) {
 // }
 
 function updateEmployee(i: string, employeeList?: Array<Employee>): void {
-    employeeList[i]["_name"] = nameEdit["value"];
-    employeeList[i]["_address"] = addressEdit["value"];
-    employeeList[i]["_phone"] = phoneEdit["value"];
-    employeeList[i]["_email"] = emailEdit["value"];
-    renderEmployeeList(employeeList);
-    employeeManager.saveEmployeeListToLocal();
+    if (validateInput(nameEdit, emailEdit, addressEdit, phoneEdit)) {
+        //@ts-ignore
+        $("#editEmployeeModal").modal("hide")
+        employeeList[i]["_name"] = nameEdit["value"];
+        employeeList[i]["_address"] = addressEdit["value"];
+        employeeList[i]["_phone"] = phoneEdit["value"];
+        employeeList[i]["_email"] = emailEdit["value"];
+        renderEmployeeList(employeeList);
+        employeeManager.saveEmployeeListToLocal();
+    }
+    // resetAddInput(nameEdit, emailEdit, addressEdit, phoneEdit);
     // resetEditBtn();
 
 }
@@ -336,13 +398,10 @@ function renderEmployeeList(employeeMnr: EmployeeManager | Array<Employee>, sear
         arr = employeeMnr;
     }
 
-    console.log(searchValue)
-
-    function replacer(match) {
+    const replacer = (match): string => {
         return `<strong style="color: orangered">${match}</strong>`;
     }
 
-    // console.log(arr)
     if (arr.length === 0) {
         html += "<tr>"
         html += "<td>No Data</td>"
