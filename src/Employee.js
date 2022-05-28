@@ -4,6 +4,7 @@ export class Employee {
         this._email = email;
         this._address = address;
         this._phone = phone;
+        this._ID = Employee.ID++;
     }
     get name() {
         return this._name;
@@ -30,4 +31,5 @@ export class Employee {
         this._phone = value;
     }
 }
+Employee.ID = 0;
 //# sourceMappingURL=Employee.js.map

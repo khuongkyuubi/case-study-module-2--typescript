@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Bootstrap CRUD Data Table for Database with Modal Form</title>
+    <title>Employee Manager</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto|Varela+Round">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
@@ -16,14 +16,19 @@
         <div class="table-wrapper">
             <div class="table-title">
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <h2>Manage <b>Employees</b></h2>
                     </div>
-                    <div class="col-sm-6">
+                    <div class="col-sm-8">
                         <a href="#addEmployeeModal" class="btn btn-success" data-toggle="modal"><i
                                 class="material-icons">&#xE147;</i> <span>Add New Employee</span></a>
-                        <a href="#deleteEmployeeModal" class="btn btn-danger" data-toggle="modal"><i
+                        <a href="#deleteMultiEmployeeModal" class="btn btn-danger" data-toggle="modal"><i
                                 class="material-icons">&#xE15C;</i> <span>Delete</span></a>
+
+                        <div class="search-box">
+                            <i class="material-icons">&#xE8B6;</i>
+                            <input id="search-input" type="text" class="form-control" placeholder="Search&hellip;">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -38,54 +43,69 @@
 							</span>
                     </th>
                     <th>No.</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                    <th>Address</th>
+                    <th>Name
+                        <span id="sort-name-asc" aria-valuetext="name"><i class="fa fa-sort-amount-asc"
+                                                                          aria-hidden="true"></i></span>
+                        <span id="sort-name-desc" aria-valuetext="name" hidden><i class="fa fa-sort-amount-desc"
+                                                                                  aria-hidden="true"></i></span>
+                    </th>
+                    <th>Email
+                        <span id="sort-email-asc" aria-valuetext="email"><i class="fa fa-sort-amount-asc"
+                                                                            aria-hidden="true"></i></span>
+                        <span id="sort-email-desc" aria-valuetext="email" hidden><i class="fa fa-sort-amount-desc"
+                                                                                    aria-hidden="true"></i></span>
+                    </th>
+                    <th>Address
+                        <span id="sort-address-asc" aria-valuetext="address"><i class="fa fa-sort-amount-asc"
+                                                                                aria-hidden="true"></i></span>
+                        <span id="sort-address-desc" aria-valuetext="address" hidden><i class="fa fa-sort-amount-desc"
+                                                                                        aria-hidden="true"></i></span>
+                    </th>
                     <th>Phone</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody id="employee-list">
-<!--                <tr>-->
-<!--                    <td>-->
-<!--							<span class="custom-checkbox">-->
-<!--								<input type="checkbox" id="checkbox1" name="options[]" value="1">-->
-<!--								<label for="checkbox1"></label>-->
-<!--							</span>-->
-<!--                    </td>-->
-<!--                    <td>Thomas Hardy</td>-->
-<!--                    <td>thomashardy@mail.com</td>-->
-<!--                    <td>89 Chiaroscuro Rd, Portland, USA</td>-->
-<!--                    <td>(171) 555-2222</td>-->
-<!--                    <td>-->
-<!--                        <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"-->
-<!--                                                                                         data-toggle="tooltip"-->
-<!--                                                                                         title="Edit">&#xE254;</i></a>-->
-<!--                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons"-->
-<!--                                                                                             data-toggle="tooltip"-->
-<!--                                                                                             title="Delete">&#xE872;</i></a>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>-->
-<!--							<span class="custom-checkbox">-->
-<!--								<input type="checkbox" id="checkbox2" name="options[]" value="1">-->
-<!--								<label for="checkbox2"></label>-->
-<!--							</span>-->
-<!--                    </td>-->
-<!--                    <td>Dominique Perrier</td>-->
-<!--                    <td>dominiqueperrier@mail.com</td>-->
-<!--                    <td>Obere Str. 57, Berlin, Germany</td>-->
-<!--                    <td>(313) 555-5735</td>-->
-<!--                    <td>-->
-<!--                        <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"-->
-<!--                                                                                         data-toggle="tooltip"-->
-<!--                                                                                         title="Edit">&#xE254;</i></a>-->
-<!--                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons"-->
-<!--                                                                                             data-toggle="tooltip"-->
-<!--                                                                                             title="Delete">&#xE872;</i></a>-->
-<!--                    </td>-->
-<!--                </tr>-->
+                <!--                <tr>-->
+                <!--                    <td>-->
+                <!--							<span class="custom-checkbox">-->
+                <!--								<input type="checkbox" id="checkbox1" name="options[]" value="1">-->
+                <!--								<label for="checkbox1"></label>-->
+                <!--							</span>-->
+                <!--                    </td>-->
+                <!--                    <td>Thomas Hardy</td>-->
+                <!--                    <td>thomashardy@mail.com</td>-->
+                <!--                    <td>89 Chiaroscuro Rd, Portland, USA</td>-->
+                <!--                    <td>(171) 555-2222</td>-->
+                <!--                    <td>-->
+                <!--                        <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"-->
+                <!--                                                                                         data-toggle="tooltip"-->
+                <!--                                                                                         title="Edit">&#xE254;</i></a>-->
+                <!--                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons"-->
+                <!--                                                                                             data-toggle="tooltip"-->
+                <!--                                                                                             title="Delete">&#xE872;</i></a>-->
+                <!--                    </td>-->
+                <!--                </tr>-->
+                <!--                <tr>-->
+                <!--                    <td>-->
+                <!--							<span class="custom-checkbox">-->
+                <!--								<input type="checkbox" id="checkbox2" name="options[]" value="1">-->
+                <!--								<label for="checkbox2"></label>-->
+                <!--							</span>-->
+                <!--                    </td>-->
+                <!--                    <td>Dominique Perrier</td>-->
+                <!--                    <td>dominiqueperrier@mail.com</td>-->
+                <!--                    <td>Obere Str. 57, Berlin, Germany</td>-->
+                <!--                    <td>(313) 555-5735</td>-->
+                <!--                    <td>-->
+                <!--                        <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"-->
+                <!--                                                                                         data-toggle="tooltip"-->
+                <!--                                                                                         title="Edit">&#xE254;</i></a>-->
+                <!--                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons"-->
+                <!--                                                                                             data-toggle="tooltip"-->
+                <!--                                                                                             title="Delete">&#xE872;</i></a>-->
+                <!--                    </td>-->
+                <!--                </tr>-->
                 <!--                <tr>-->
                 <!--                    <td>-->
                 <!--							<span class="custom-checkbox">-->
@@ -149,16 +169,16 @@
                 </tbody>
             </table>
             <div class="clearfix">
-                <div class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>
-                <ul class="pagination">
-                    <li class="page-item disabled"><a href="#">Previous</a></li>
-                    <li class="page-item"><a href="#" class="page-link">1</a></li>
-                    <li class="page-item"><a href="#" class="page-link">2</a></li>
-                    <li class="page-item active"><a href="#" class="page-link">3</a></li>
-                    <li class="page-item"><a href="#" class="page-link">4</a></li>
-                    <li class="page-item"><a href="#" class="page-link">5</a></li>
-                    <li class="page-item"><a href="#" class="page-link">Next</a></li>
-                </ul>
+                <div id="show-entries-quantity" class="hint-text">Showing <b>5</b> out of <b>25</b> entries</div>
+                <!--                <ul class="pagination">-->
+                <!--                    <li class="page-item disabled"><a href="#">Previous</a></li>-->
+                <!--                    <li class="page-item"><a href="#" class="page-link">1</a></li>-->
+                <!--                    <li class="page-item"><a href="#" class="page-link">2</a></li>-->
+                <!--                    <li class="page-item active"><a href="#" class="page-link">3</a></li>-->
+                <!--                    <li class="page-item"><a href="#" class="page-link">4</a></li>-->
+                <!--                    <li class="page-item"><a href="#" class="page-link">5</a></li>-->
+                <!--                    <li class="page-item"><a href="#" class="page-link">Next</a></li>-->
+                <!--                </ul>-->
             </div>
         </div>
     </div>
@@ -167,32 +187,32 @@
 <div id="addEmployeeModal" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Add Employee</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <div class="modal-header">
+                <h4 class="modal-title">Add Employee</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input id="name" type="text" class="form-control" required>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input id="name" type="text" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input id="email" type="email" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="address">Address</label>
-                        <textarea id="address" class="form-control" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone</label>
-                        <input id="phone" type="text" class="form-control" required>
-                    </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input id="email" type="email" class="form-control" required>
                 </div>
-                <div class="modal-footer">
-                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                    <input id="add-save" type="button" class="btn btn-success" data-dismiss="modal" value="Add-Save">
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <textarea id="address" class="form-control" required></textarea>
                 </div>
+                <div class="form-group">
+                    <label for="phone">Phone</label>
+                    <input id="phone" type="text" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                <input id="add-save" type="button" class="btn btn-success" data-dismiss="modal" value="Add-Save">
+            </div>
         </div>
     </div>
 </div>
@@ -201,56 +221,83 @@
     <div class="modal-dialog">
         <div class="modal-content">
 
-                <div class="modal-header">
-                    <h4 class="modal-title">Edit Employee</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body">
+            <div class="modal-header">
+                <h4 class="modal-title">Edit Employee</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
 
-                    <p id="employee-number"></p>
+                <p id="employee-number"></p>
 
-                    <div class="form-group">
-                        <label for="name-edit">Name</label>
-                        <input id="name-edit" type="text" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="email-edit">Email</label>
-                        <input id="email-edit" type="email" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="address-edit">Address</label>
-                        <textarea id="address-edit" class="form-control" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone-edit">Phone</label>
-                        <input id="phone-edit" type="text" class="form-control" required>
-                    </div>
+                <div class="form-group">
+                    <label for="name-edit">Name</label>
+                    <input id="name-edit" type="text" class="form-control" required>
                 </div>
-                <div class="modal-footer">
-                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                    <input id="save-edit"  type="button" class="btn btn-info" data-dismiss="modal"  value="Save-Edit">
+                <div class="form-group">
+                    <label for="email-edit">Email</label>
+                    <input id="email-edit" type="email" class="form-control" required>
                 </div>
+                <div class="form-group">
+                    <label for="address-edit">Address</label>
+                    <textarea id="address-edit" class="form-control" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="phone-edit">Phone</label>
+                    <input id="phone-edit" type="text" class="form-control" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                <input id="save-edit" type="button" class="btn btn-info" data-dismiss="modal" value="Save-Edit">
+            </div>
 
         </div>
     </div>
 </div>
 <!-- Delete Modal HTML -->
 <div id="deleteEmployeeModal" class="modal fade">
+    <p id="remove-employee-index" data=""></p>
     <div class="modal-dialog">
         <div class="modal-content">
 
-                <div class="modal-header">
-                    <h4 class="modal-title">Delete Employee</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete these Records?</p>
-                    <p class="text-warning"><small>This action cannot be undone.</small></p>
-                </div>
-                <div class="modal-footer">
-                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                    <input type="button" class="btn btn-danger" id="multi-delete" data-dismiss="modal" value="Delete">
-                </div>
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Employee</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete these Records?</p>
+                <p class="text-warning"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                <input type="button" class="btn btn-danger" id="delete-btn" data-dismiss="modal"
+                       value="Delete">
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Delete Multi Modal HTML -->
+<div id="deleteMultiEmployeeModal" class="modal fade">
+    <!--    <p id="remove-employee-index" data=""></p>-->
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Delete Employee</h4>
+
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete these <b>selected</b> Records?</p>
+                <p class="text-warning"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer">
+                <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                <input type="button" class="btn btn-danger" id="delete-multi-btn" data-dismiss="modal" value="Delete Selected">
+            </div>
 
         </div>
     </div>

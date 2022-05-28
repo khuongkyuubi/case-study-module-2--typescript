@@ -3,12 +3,15 @@ export class Employee {
     private _email: string;
     private _address: string;
     private _phone: string;
+    private _ID: number;
+    private static ID: number = 0;
 
     constructor(name: string, email: string, address: string, phone: string) {
         this._name = name;
         this._email = email;
         this._address = address;
         this._phone = phone;
+        this._ID = Employee.ID++;
     }
 
 

@@ -1,31 +1,28 @@
 // import {EmployeeManager} from "./EmployeeManager";
 import {EmployeeManager} from "./EmployeeManager.js";
+import {Employee} from "./Employee";
 
 const employeeManager = new EmployeeManager();
 
-
 window.addEventListener("load", () => {
     renderEmployeeList(employeeManager);
-    // updateButtonDelete()
+    updateSearchInput();
+    // updateEditBtn();
 
-    // updateDeleteBtn();
 })
 
 
-let index;
-
-function updateAddBtn() {
-    let updateAdd = document.getElementById("add-save");
-    updateAdd.addEventListener("click", addEmployee)
-}
-
-
-// get input element
+// Add new employee
+// Get input element
 let name = document.getElementById('name') as HTMLInputElement
 let address = document.getElementById('address') as HTMLInputElement
 let phone = document.getElementById('phone') as HTMLInputElement;
 let email = document.getElementById('email') as HTMLInputElement;
 
+function updateAddBtn() {
+    let updateAdd = document.getElementById("add-save");
+    updateAdd.addEventListener("click", addEmployee)
+}
 
 function resetAddInput(): void {
     name["value"] = "";
@@ -34,89 +31,100 @@ function resetAddInput(): void {
     email["value"] = "";
 }
 
-//
 function addEmployee(): void {
     employeeManager.addEmployee(name["value"], email["value"], address["value"], phone["value"]);
     renderEmployeeList(employeeManager);
     resetAddInput();
 }
 
-
-// for (let i in deleteBtns) {
-//     deleteBtns[i].addEventListener("click", ()=> {
-//         console.log("Hello")
-//     })
-// }
-//
-// function updateDeleteBtns() {
-//     const deleteBtns = document.getElementsByClassName("delete-confirm");
-//     for (let i in deleteBtns) {
-//         deleteBtns[i].addEventListener("click", ()=> {
-//             console.log("Hello")
-//         })
-//     }
-//
-// }
-// updateDeleteBtns();
-
-
-// update Feature
-//get edit input element
+// Update Feature
+//Get edit input element
 let nameEdit = document.getElementById('name-edit') as HTMLInputElement
 let addressEdit = document.getElementById('address-edit') as HTMLInputElement
 let phoneEdit = document.getElementById('phone-edit') as HTMLInputElement;
 let emailEdit = document.getElementById('email-edit') as HTMLInputElement;
 let employeeNumberEdit = document.getElementById('employee-number') as HTMLElement;
 
-function updateEditBtn(): void {
+function updateEditBtn(employeeList?: Array<Employee>): void {
     let editBtn = document.getElementsByClassName("edit");
     for (let i = 0; i < editBtn.length; i++) {
         editBtn[i].addEventListener("click", () => {
-            nameEdit["value"] = employeeManager.employeeList[i].name;
-            addressEdit["value"] = employeeManager.employeeList[i].address;
-            phoneEdit["value"] = employeeManager.employeeList[i].phone;
-            emailEdit["value"] = employeeManager.employeeList[i].email;
-            employeeNumberEdit["data"] = i.toString();
-            updateSaveEditBtn();
+            if (document.getElementById("search-input")["value"] && employeeList) {
+                try {
+                    nameEdit["value"] = employeeList[i]["_name"];
+                    addressEdit["value"] = employeeList[i]["_address"];
+                    phoneEdit["value"] = employeeList[i]["_phone"];
+                    emailEdit["value"] = employeeList[i]["_email"];
+                    employeeNumberEdit["data"] = i.toString();
+                    updateSaveEditBtn(employeeList);
+                } catch (err) {
+                    console.log(err)
+                }
+
+            } else {
+                nameEdit["value"] = employeeManager.employeeList[i]["_name"];
+                addressEdit["value"] = employeeManager.employeeList[i]["_address"];
+                phoneEdit["value"] = employeeManager.employeeList[i]["_phone"];
+                emailEdit["value"] = employeeManager.employeeList[i]["_email"];
+                employeeNumberEdit["data"] = i.toString();
+                updateSaveEditBtn();
+            }
+
+
         })
     }
 
 }
 
-function updateSaveEditBtn() {
+function updateSaveEditBtn(employeeList?: Array<Employee>) {
     let saveEditBtn = document.getElementById("save-edit");
     saveEditBtn.addEventListener("click", () => {
-        updateEmployee(employeeNumberEdit["data"]);
+        if (document.getElementById("search-input")["value"] && employeeList) {
+            updateEmployee(employeeNumberEdit["data"], employeeList);
+        } else {
+            updateEmployee(employeeNumberEdit["data"], employeeManager.employeeList);
+        }
+
     })
-
 }
 
-function resetEditBtn(): void {
-    nameEdit["value"] = "";
-    addressEdit["value"] = "";
-    phoneEdit["value"] = "";
-    emailEdit["value"] = ""
-}
+// function resetEditBtn(): void {
+//     nameEdit["value"] = "";
+//     addressEdit["value"] = "";
+//     phoneEdit["value"] = "";
+//     emailEdit["value"] = ""
+// }
 
-function updateEmployee(i: string): void {
-    employeeManager.employeeList[i].name = nameEdit["value"];
-    employeeManager.employeeList[i].address = addressEdit["value"];
-    employeeManager.employeeList[i].phone = phoneEdit["value"];
-    employeeManager.employeeList[i].email = emailEdit["value"];
-    renderEmployeeList(employeeManager);
+function updateEmployee(i: string, employeeList?: Array<Employee>): void {
+    employeeList[i]["_name"] = nameEdit["value"];
+    employeeList[i]["_address"] = addressEdit["value"];
+    employeeList[i]["_phone"] = phoneEdit["value"];
+    employeeList[i]["_email"] = emailEdit["value"];
+    renderEmployeeList(employeeList);
+    employeeManager.saveEmployeeListToLocal();
     // resetEditBtn();
 
 }
 
-
 //Delete Feature
-function updateButtonDelete() {
-    let deleteStudent = document.getElementsByClassName('delete-confirm');
-    for (let i = 0; i < deleteStudent.length; i++) {
-        deleteStudent[i].addEventListener('click', () => {
-            deleteEmployee(i)
+// Get delete buttons element
+let numberIndex: HTMLElement = document.getElementById(("remove-employee-index"));
+let deleteBtn = document.getElementsByClassName(("delete")) as HTMLCollectionOf<HTMLElement>;
+
+function updateDeleteBtn(): void {
+    for (let i = 0; i < deleteBtn.length; i++) {
+        deleteBtn[i].addEventListener("click", () => {
+            numberIndex["data"] = i;
+            updateDeleteConfirmBtn();
         })
     }
+}
+
+function updateDeleteConfirmBtn(): void {
+    let confirmDelete = document.getElementById("delete-btn");
+    confirmDelete.addEventListener("click", () => {
+        deleteEmployee(numberIndex["data"]);
+    })
 }
 
 function deleteEmployee(index: number): void {
@@ -124,8 +132,122 @@ function deleteEmployee(index: number): void {
     renderEmployeeList(employeeManager);
 }
 
+// Search feature
 
-function updateCheckbox(): void {
+function updateSearchInput() {
+    let searchInput = document.getElementById("search-input");
+    searchInput.addEventListener("input", () => {
+        console.log(searchInput["value"])
+        searchData(searchInput["value"], employeeManager.employeeList, "_name", "_email", "_address")
+    })
+}
+
+function searchData(data: string, arr: Array<Employee>, ...field: string[]): Array<Employee> {
+    let result: Array<Employee> = [];
+    for (let i = 0; i < arr.length; i++) {
+        switch (true) {
+            case arr[i][field[0]].toLowerCase().includes(data.toLowerCase()):
+            case data.toLowerCase().includes(arr[i][field[0]].toLowerCase()):
+            case arr[i][field[1]].toLowerCase().includes(data.toLowerCase()):
+            case data.toLowerCase().includes(arr[i][field[1]].toLowerCase()):
+            case arr[i][field[2]].toLowerCase().includes(data.toLowerCase()):
+            case data.toLowerCase().includes(arr[i][field[2]].toLowerCase()):
+                result.push(arr[i]);
+                break;
+        }
+    }
+    renderEmployeeList(result)
+    updateEditBtn(result);
+    return result;
+}
+
+updateSortButton()
+
+
+// Feature sort
+function updateSortButton() {
+    let flagForNameSort: boolean = false;
+    let flagForEmailSort: boolean = false;
+    let flagForAddressSort: boolean = false;
+    let flag: boolean;
+
+    let sortNameButton = document.getElementById("sort-name-asc") as HTMLElement;
+    let sortEmailButton = document.getElementById("sort-email-asc") as HTMLElement;
+    let sortAddressButton = document.getElementById("sort-address-asc") as HTMLElement;
+
+    [sortNameButton, sortEmailButton, sortAddressButton].forEach((sortButton) => {
+        sortButton.addEventListener("click", () => {
+            switch (sortButton.id) {
+                case "sort-name-asc" :
+                    flagForNameSort = !flagForNameSort;
+                    flag = flagForNameSort;
+                    break;
+                case "sort-email-asc" :
+                    flagForEmailSort = !flagForEmailSort;
+                    flag = flagForEmailSort;
+                    break;
+                case "sort-address-asc" :
+                    flagForAddressSort = !flagForAddressSort;
+                    flag = flagForAddressSort;
+                    break;
+            }
+            sortEmployee(sortButton.id, flag);
+
+        })
+    })
+}
+
+function sortEmployee(sortButtonId: string, flag: boolean) {
+    let field: string;
+    switch (sortButtonId) {
+        case "sort-name-asc" :
+            field = "_name";
+            break;
+        case "sort-email-asc" :
+            field = "_email";
+            break;
+        case "sort-address-asc" :
+            field = "_address";
+            break;
+    }
+    console.log(field);
+
+    let arr: Employee[] = employeeManager.employeeList;
+    let j: number;
+    let temp2: Employee;
+    if (flag) {
+        for (let i = 1; i < arr.length; i++) {
+            temp2 = arr[i];
+            j = i - 1;
+            while (j >= 0 && arr[j][field] > temp2[field]) {
+                arr[j + 1] = arr[j]
+                j--;
+            }
+            arr[j + 1] = temp2;
+        }
+        flag = false;
+    } else {
+        for (let i = 1; i < arr.length; i++) {
+            temp2 = arr[i];
+            j = i - 1;
+            while (j >= 0 && arr[j][field] < temp2[field]) {
+                arr[j + 1] = arr[j]
+                j--;
+            }
+            arr[j + 1] = temp2;
+        }
+        flag = true;
+    }
+    console.log(flag)
+
+    renderEmployeeList(employeeManager.employeeList)
+    employeeManager.saveEmployeeListToLocal();
+}
+
+
+// Delete multi faeture
+// Update checkbox
+function updateCheckbox(employeeList?: Employee[]): void {
     // Select/Deselect checkboxes
     let checkbox = document.querySelectorAll('table tbody input[type="checkbox"]');
     let selectAll = document.querySelector("#selectAll")
@@ -140,54 +262,64 @@ function updateCheckbox(): void {
                 checkbox["checked"] = false;
             });
         }
-        // updateCheckbox();
     });
-
-    // checkbox.forEach((checkbox) => {
-    //
-    //     checkbox.addEventListener("click", function() {
-    //         this.forEach(function(checkbox){
-    //             if (!checkbox["checked"])
-    //                 selectAll["checked"] = false;
-    //         });
-    //     })
-    //
-    // })
-    // checkbox.click(function(){
-    //     if(!this.checked){
-    //         document.querySelector("#selectAll").checked =false;
-    //     }
-    // });
+    updateMultiDeleteBtn(employeeList);
 }
 
-function updateMultiDeleteBtn(): void {
-    let multiDeleteBtn = document.getElementById("multi-delete");
+function updateMultiDeleteBtn(employeeList?: Employee[]): void {
+    let multiDeleteBtn = document.getElementById("delete-multi-btn");
     multiDeleteBtn.addEventListener("click", () => {
         // removeMultiEmployee()
-        console.log("Multi delete")
+        // console.log("Multi delete")
+        removeMultiEmployee(employeeList)
 
 
     })
 
 }
 
-function removeMultiEmployee() {
+function removeMultiEmployee(employeeList?: Employee[]) {
     let checkbox = document.querySelectorAll('table tbody input[type="checkbox"]');
-    let listId = [];
+    let listID: number[] = [];
+    let result: Employee[] = [];
     for (let i = 0; i < checkbox.length; i++) {
         if (checkbox[i]["checked"]) {
-            employeeManager.removeEmployee(i);
-
+            listID.push(i)
         }
     }
+    if (document.getElementById("search-input")["value"] && employeeList) {
+        result = employeeList.filter((employee, index) => {
+            return listID.indexOf(index) === -1;
+        })
+
+    } else {
+        result = employeeManager.employeeList.filter((employee, index) => {
+            return listID.indexOf(index) === -1;
+        })
+
+    }
+    employeeManager.setEmployeeList(result);
+    console.log(result)
     renderEmployeeList(employeeManager);
+    employeeManager.saveEmployeeListToLocal();
 
 }
 
 
-function renderEmployeeList(employeeManager: EmployeeManager): void {
+// Render List Method (Read feature)
+function renderEmployeeList(employeeMnr: EmployeeManager | Array<Employee>, searchValue?: string): void {
     let html = "";
-    let arr = employeeManager.employeeList
+    let arr: Array<Employee>
+
+
+    if (employeeMnr instanceof EmployeeManager) {
+        arr = employeeMnr.employeeList;
+    } else {
+        arr = employeeMnr;
+    }
+
+
+    // console.log(arr)
     if (arr.length === 0) {
         html += "<tr>"
         html += "<td>No Data</td>"
@@ -198,175 +330,40 @@ function renderEmployeeList(employeeManager: EmployeeManager): void {
             html += `
              <td>
                     <span class="custom-checkbox">
-                    <input type="checkbox" id="checkbox${i}" name="options[]" value="${i}">
+                    <input type="checkbox" class="delete-checkbox" id="checkbox${i}" name="options[]" value="${i}">
                     <label for="checkbox${i}"></label>
                     </span>
             </td>
             `
             html += `<td>${i + 1}</td>`
-            html += `<td>${arr[i].name}</td>`
-            html += `<td>${arr[i].email}</td>`
-            html += `<td>${arr[i].address}</td>`
-            html += `<td>${arr[i].phone}</td>`
+            html += `<td>${arr[i]["_name"]}</td>`
+            html += `<td>${arr[i]["_email"]}</td>`
+            html += `<td>${arr[i]["_address"]}</td>`
+            html += `<td>${arr[i]["_phone"]}</td>`
             html += `<td>
                      <a href="#editEmployeeModal" class="edit" data-toggle="modal"><i class="material-icons"
                                                                                          data-toggle="tooltip"
                                                                                          title="Edit">&#xE254;</i></a>
-                     <a href="#deleteEmployeeModal-${i}" class="delete" data-toggle="modal"><i class="material-icons"
+                     <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons"
                                                                                              data-toggle="tooltip"
                                                                                              title="Delete">&#xE872;</i></a>
                     </td>`
-            html += `<!-- Delete Modal HTML -->
-<div id="deleteEmployeeModal-${i}" class="modal fade">
-    <div class="modal-dialog">
-        <div class="modal-content">
-
-                <div class="modal-header">
-                    <h4 class="modal-title">Delete Employee</h4>
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete index ${i} these Records?</p>
-                    <p class="text-warning"><small>This action cannot be undone.</small></p>
-                </div>
-                <div class="modal-footer">
-                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                    <input type="button" id="${i}" class="btn btn-danger delete-confirm"
-                    data-dismiss="modal" 
-                     value="Delete">
-                </div>
-
-        </div>
-    </div>
-</div>`
             html += "</tr>"
         }
     }
+
+
     document.getElementById('employee-list').innerHTML = html;
+    document.getElementById("show-entries-quantity").innerHTML = `Showing <b>${arr.length}</b> out of  <b>${employeeManager.employeeList.length}</b>  entries`
     updateAddBtn();
     updateEditBtn();
-    updateButtonDelete();
-    updateCheckbox();
-    updateMultiDeleteBtn();
+    updateDeleteBtn();
+
+    if (employeeMnr instanceof EmployeeManager) {
+        updateCheckbox();
+    } else {
+        updateCheckbox(employeeMnr);
+    }
+    // updateMultiDeleteBtn();
 }
-
-
-//
-//
-// let address = document.getElementById('address') as HTMLInputElement;
-// let nameConfirm = document.getElementById('name') as HTMLInputElement;
-// let ageConfirm = document.getElementById('age') as HTMLInputElement;
-// let phoneConfirm = document.getElementById('phone') as HTMLInputElement;
-// let emailConfirm = document.getElementById('email') as HTMLInputElement;
-//
-// function clearInputConfirm() {
-//     nameConfirm.value = ""
-//     ageConfirm.value = ""
-//     phoneConfirm.value = ""
-//     emailConfirm.value = ""
-// }
-//
-// //
-
-// document.getElementById('search-data').addEventListener('input', searchStudent)
-//
-// //search
-// function searchStudent() {
-//     let searchInput = (document.getElementById('search-data') as HTMLInputElement).value
-//     let searchValue = employeeManager.employeeList.filter(value => {
-//         return value.name.toUpperCase().includes(searchInput.toUpperCase());
-//     })
-//     employeeManager.renderList(searchValue)
-// }
-//
-// //
-// function editButtonStudent() {
-//     let editStudent = document.getElementsByClassName('edit');
-//     for (let i = 0; i < editStudent.length; i++) {
-//         editStudent[i].addEventListener('click', () => {
-//             index = editStudent[i].getAttribute('value');
-//             console.log('dfds', index)
-//             employeeManager.edit(+index);
-//             editButtonStudent()
-//         })
-//     }
-//     document.getElementById('confirm').addEventListener('click', function () {
-//         employeeManager.employeeList[index].name = (document.getElementById('name-confirm') as HTMLInputElement).value
-//         employeeManager.employeeList[index].address = (document.getElementById('age-confirm') as HTMLInputElement).value
-//         employeeManager.employeeList[index].phone = (document.getElementById('phone-confirm') as HTMLInputElement).value
-//         employeeManager.employeeList[index].email = (document.getElementById('email-confirm') as HTMLInputElement).value
-//         employeeManager.renderList(employeeManager.employeeList)
-//         clearInputConfirm()
-//     })
-//
-// }
-
-// function clearInput() {
-//     name.value = ''
-//     age.value = ''
-//     phone.value = ''
-//     email.value = ''
-// }
-
-// document.getElementById('add').addEventListener('click', saveStudent);
-
-
-// function saveStudent() {
-//     employeeManager.addEmployee(name.value, age.value, phone.value, email.value)
-//     clearInput()
-//     editButtonStudent()
-//     updateButtonDelete()
-//
-//
-// }
-
-
-// function isRequire(inputElement) {
-//     let div = inputElement.parentElement;
-//     let error = document.createElement('small');
-//     let small = div.appendChild(error);
-//
-//
-//     inputElement.addEventListener('blur', () => {
-//         if (inputElement.value === "") {
-//             inputElement.style.borderColor = 'red';
-//             small.innerText = `nhap ${inputElement.id} vao o chau ei`
-//             this.errors++;
-//
-//         } else {
-//             inputElement.style.borderColor = 'blue';
-//             this.user[inputElement.id] = inputElement.value;
-//             small.hidden = true;
-//             this.errors --;
-//         }
-//     })
-// }
-
-// function checkFuck(inputElement){
-//
-//     let div = inputElement.parentElement;
-//     console.log(div.children.length)
-//     if(div.children.length > 3){
-//         return
-//     }
-//     let error = document.createElement('small');
-//     let small = div.appendChild(error);
-//     if (inputElement.value === "") {
-//         inputElement.style.borderColor = 'red';
-//         small.innerText = `nhap ${inputElement.id} vao o chau ei`
-//         this.errors++;
-//
-//     } else {
-//         inputElement.style.borderColor = 'blue';
-//         small.hidden = true;
-//         this.errors --;
-//     }
-// }
-
-
-// isRequire(name)
-// isRequire(age)
-// isRequire(phone)
-// isRequire(email)
-//
 
